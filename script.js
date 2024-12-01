@@ -7,14 +7,13 @@ const toastMessage = document.getElementById("toastMessage");
 
 let selectedAmount = null;
 let userAccount = null;
-let selectedButton = null; // Seçili buton için değişken
+let selectedButton = null;
 
-// Toast mesajını gösteren fonksiyon
+
 function showToast(message) {
     toastMessage.innerText = message;
     toastMessage.classList.add("show");
 
-    // Mesajı 3 saniye sonra gizle
     setTimeout(() => {
         toastMessage.classList.remove("show");
     }, 3000);
@@ -63,16 +62,15 @@ connectButton.addEventListener("click", async () => {
 // Select Bet Amount
 document.querySelectorAll(".bet").forEach(button => {
     button.addEventListener("click", () => {
-        // Eğer daha önce bir buton seçildiyse, eski stilini kaldır
+
         if (selectedButton) {
             selectedButton.classList.remove("selected");
         }
 
-        // Yeni seçilen butona stil ekle
+
         selectedButton = button;
         selectedButton.classList.add("selected");
 
-        // Seçilen miktarı al ve "Place Bet" butonunu aktif et
         selectedAmount = button.getAttribute("data-value");
         showToast(`Selected Bet Amount: ${selectedAmount} ETH`);
         placeBetButton.disabled = false;
