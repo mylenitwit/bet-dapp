@@ -6,14 +6,40 @@ const recipientAddress = "0x0a8297764Cc0ad4d3ED75358431E01a63Aa1Dcf8";
 
 let selectedAmount = null;
 let userAccount = null;
+let provider;
 
-// Connect Metamask
+// Connect Metamask and switch to Abstract Chain
 connectButton.addEventListener("click", async () => {
     if (window.ethereum) {
         try {
+            // Request accounts from Metamask
             const accounts = await ethereum.request({ method: "eth_requestAccounts" });
             userAccount = accounts[0];
             accountDisplay.innerText = `Connected: ${userAccount}`;
+
+            // Switch to Abstract Chain if not already on it
+            const chainId = "11124";  // Abstract Chain Testnet Chain ID in hexadecimal
+            const currentChainId = await ethereum.request({ method: "eth_chainId" });
+
+            if (currentChainId !== chainId) {
+                await ethereum.request({
+                    method: "wallet_addEthereumChain",
+                    params: [
+                        {
+                            chainId: chainId,
+                            chainName: "Abstract Testnet",
+                            rpcUrls: ["https://api.testnet.abs.xyz"],
+                            nativeCurrency: {
+                                name: "ETH",
+                                symbol: "ETH",
+                                decimals: 18,
+                            },
+                            blockExplorerUrls: ["https://explorer.testnet.abs.xyz"],
+                        },
+                    ],
+                });
+                alert("Switched to Abstract Testnet.");
+            }
         } catch (error) {
             console.error(error);
             alert("Failed to connect to Metamask!");
@@ -38,7 +64,9 @@ placeBetButton.addEventListener("click", async () => {
         alert("Please select an amount and connect your wallet!");
         return;
     }
+
     try {
+        // Send the transaction to the recipient address using Abstract Chain
         const tx = await ethereum.request({
             method: "eth_sendTransaction",
             params: [
@@ -49,6 +77,7 @@ placeBetButton.addEventListener("click", async () => {
                 },
             ],
         });
+
         alert(`Transaction sent! Tx Hash: ${tx}`);
         recentActivity.innerText += `Sent ${selectedAmount} ETH to ${recipientAddress}\n`;
     } catch (error) {
