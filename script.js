@@ -39,8 +39,8 @@ placeBetButton.addEventListener("click", async () => {
     }
 
     // Kullanıcının doğru ağa bağlı olduğunu kontrol edin
-    const chainId = await ethereum.request({ method: "11124" });
-    if (chainId !== "11124") { // Abstract Chain'in Chain ID'sini kullanın
+    const chainId = await ethereum.request({ method: "api.testnet.abs.xyz" });
+    if (chainId !== "api.testnet.abs.xyz") { // Abstract Chain'in Chain ID'sini kullanın
         alert("Lütfen Abstract ağına bağlanın!");
         return;
     }
