@@ -54,6 +54,7 @@ document.querySelectorAll(".bet").forEach(button => {
         // Eğer daha önce bir buton seçildiyse, eski stilini kaldır
         if (selectedButton) {
             selectedButton.classList.remove("selected");
+            selectedButton.classList.remove("bet");
         }
 
         // Yeni seçilen butona stil ekle
