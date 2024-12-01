@@ -1,76 +1,36 @@
-const placeBetButton = document.getElementById("placeBetButton");
-const connectButton = document.getElementById("connectButton");
-const accountDisplay = document.getElementById("account");
-const recentActivity = document.getElementById("recentActivity");
+import { Provider, Wallet } from "zksync-ethers";
+import { ethers } from "ethers";
+
+const provider = new Provider("https://api.testnet.abs.xyz");
 const recipientAddress = "0x0a8297764Cc0ad4d3ED75358431E01a63Aa1Dcf8";
+let userWallet;
 
-let selectedAmount = null;
-let userAccount = null;
+// Metamask bağlantısı
+async function connectMetamask() {
+    const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+    await web3Provider.send("eth_requestAccounts", []);
+    const signer = web3Provider.getSigner();
+    userWallet = new Wallet(signer, provider);
+    console.log("Metamask bağlandı:", await signer.getAddress());
+}
 
-// Connect Metamask
-connectButton.addEventListener("click", async () => {
-    if (window.ethereum) {
-        try {
-            const accounts = await ethereum.request({ method: "eth_requestAccounts" });
-            userAccount = accounts[0];
-            accountDisplay.innerText = `Connected: ${userAccount}`;
-        } catch (error) {
-            console.error(error);
-            alert("Failed to connect to Metamask!");
-        }
-    } else {
-        alert("Please install Metamask!");
-    }
-});
-
-// Select Bet Amount
-document.querySelectorAll(".bet").forEach(button => {
-    button.addEventListener("click", () => {
-        selectedAmount = button.getAttribute("data-value");
-        alert(`Selected Bet Amount: ${selectedAmount} ETH`);
-        placeBetButton.disabled = false;
-    });
-});
-
-placeBetButton.addEventListener("click", async () => {
+// İşlem gönderimi
+async function sendTransaction(amount) {
     try {
-        // UI Güncelleniyor
-        placeBetButton.disabled = true;
-        placeBetButton.innerText = "Processing...";
-
-        // Ağ bağlantısı ve işlem
-        const chainId = await ethereum.request({ method: "eth_chainId" });
-        if (chainId !== "0xABCD") {
-            alert("Lütfen Abstract ağına bağlanın!");
-            return;
-        }
-
-        const tx = await ethereum.request({
-            method: "eth_sendTransaction",
-            params: [
-                {
-                    from: userAccount,
-                    to: recipientAddress,
-                    value: ethers.utils.parseUnits(selectedAmount, 18).toHexString(),
-                },
-            ],
+        const value = ethers.utils.parseEther(amount.toString());
+        const tx = await userWallet.sendTransaction({
+            to: recipientAddress,
+            value,
         });
-
-        // Başarılı işlem sonrası
-        alert(`İşlem gönderildi! Tx Hash: ${tx}`);
-        recentActivity.innerText += `Sent ${selectedAmount} ABT to ${recipientAddress}\n`;
-
+        console.log(`İşlem gönderildi! Tx Hash: ${tx.hash}`);
     } catch (error) {
-        console.error(error);
-        alert("İşlem başarısız oldu!");
-    } finally {
-        // UI Güncellemeleri Geri Alınıyor
-        placeBetButton.disabled = false;
-        placeBetButton.innerText = "Place Bet";
+        console.error("İşlem başarısız:", error);
     }
-});
+}
 
-// Show Recent Activity
-document.getElementById("recentActivityButton").addEventListener("click", () => {
-    alert(recentActivity.innerText || "No recent activity.");
+// Örnek arayüz işlevleri
+document.getElementById("connectButton").addEventListener("click", connectMetamask);
+document.getElementById("placeBetButton").addEventListener("click", () => {
+    const amount = document.querySelector('input[name="betAmount"]:checked').value;
+    sendTransaction(amount);
 });
