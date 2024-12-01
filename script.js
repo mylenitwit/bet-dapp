@@ -6,8 +6,8 @@ const recipientAddress = "0x0a8297764Cc0ad4d3ED75358431E01a63Aa1Dcf8";
 
 let selectedAmount = null;
 let userAccount = null;
-let provider;
-let selectedButton = null;
+let selectedButton = null; // Seçili buton için değişken
+
 // Connect Metamask and switch to Abstract Chain
 connectButton.addEventListener("click", async () => {
     if (window.ethereum) {
@@ -42,6 +42,7 @@ connectButton.addEventListener("click", async () => {
             }
         } catch (error) {
             console.error(error);
+            alert("Failed to connect to Metamask!");
         }
     } else {
         alert("Please install Metamask!");
