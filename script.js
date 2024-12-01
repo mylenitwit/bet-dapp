@@ -51,7 +51,18 @@ connectButton.addEventListener("click", async () => {
 // Select Bet Amount
 document.querySelectorAll(".bet").forEach(button => {
     button.addEventListener("click", () => {
+        // Eğer daha önce bir buton seçildiyse, eski stilini kaldır
+        if (selectedButton) {
+            selectedButton.classList.remove("selected");
+        }
+
+        // Yeni seçilen butona stil ekle
+        selectedButton = button;
+        selectedButton.classList.add("selected");
+
+        // Seçilen miktarı al ve "Place Bet" butonunu aktif et
         selectedAmount = button.getAttribute("data-value");
+        alert(`Selected Bet Amount: ${selectedAmount} ETH`);
         placeBetButton.disabled = false;
     });
 });
