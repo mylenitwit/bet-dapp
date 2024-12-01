@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abstract Betting DApp</title>
+</head>
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 400px;
+    margin: auto;
+    padding: 20px;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+h1 {
+    color: #333;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 10px 0;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #fff;
+}
+
+button:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+}
+
+.bet-buttons button {
+    margin: 5px;
+    background-color: #28a745;
+}
+
+#recentActivity {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #555;
+}
+
+</style>
+<body>
+    <div class="container">
+        <h1>ETH Betting DApp</h1>
+        
+        <!-- Metamask Connect -->
+        <button id="connectButton">Connect Metamask</button>
+        <p id="account"></p>
+
+        <!-- Bet Amount Buttons -->
+        <div class="bet-buttons">
+            <button class="bet" data-value="0.001">0.001 ETH</button>
+            <button class="bet" data-value="0.01">0.01 ETH</button>
+            <button class="bet" data-value="0.1">0.1 ETH</button>
+            <button class="bet" data-value="1">1 ETH</button>
+        </div>
+
+        <!-- Place Bet Button -->
+        <button id="placeBetButton" disabled>Place Bet</button>
+
+        <!-- Recent Activity -->
+        <button id="recentActivityButton">Recent Activity</button>
+        <div id="recentActivity"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
