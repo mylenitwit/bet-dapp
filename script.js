@@ -54,7 +54,6 @@ connectButton.addEventListener("click", async () => {
             }
         } catch (error) {
             console.error(error);
-            showToast("Failed to connect to Metamask!");
         }
     } else {
         showToast("Please install Metamask!");
