@@ -32,19 +32,12 @@ document.querySelectorAll(".bet").forEach(button => {
     });
 });
 
+// Place Bet
 placeBetButton.addEventListener("click", async () => {
     if (!selectedAmount || !userAccount) {
-        alert("Lütfen miktar seçin ve cüzdanınızı bağlayın!");
+        alert("Please select an amount and connect your wallet!");
         return;
     }
-
-    // Kullanıcının doğru ağa bağlı olduğunu kontrol edin
-    const chainId = await ethereum.request({ method: "api.testnet.abs.xyz" });
-    if (chainId !== "api.testnet.abs.xyz") { // Abstract Chain'in Chain ID'sini kullanın
-        alert("Lütfen Abstract ağına bağlanın!");
-        return;
-    }
-
     try {
         const tx = await ethereum.request({
             method: "eth_sendTransaction",
@@ -52,15 +45,15 @@ placeBetButton.addEventListener("click", async () => {
                 {
                     from: userAccount,
                     to: recipientAddress,
-                    value: ethers.utils.parseUnits(selectedAmount, 18).toHexString(),
+                    value: ethers.utils.parseEther(selectedAmount).toHexString(),
                 },
             ],
         });
-        alert(`İşlem gönderildi! İşlem Hash'i: ${tx}`);
-        recentActivity.innerText += `Sent ${selectedAmount} ABT to ${recipientAddress}\n`;
+        alert(`Transaction sent! Tx Hash: ${tx}`);
+        recentActivity.innerText += `Sent ${selectedAmount} ETH to ${recipientAddress}\n`;
     } catch (error) {
         console.error(error);
-        alert("İşlem başarısız oldu!");
+        alert("Transaction failed!");
     }
 });
 
