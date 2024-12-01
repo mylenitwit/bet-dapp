@@ -3,10 +3,22 @@ const connectButton = document.getElementById("connectButton");
 const accountDisplay = document.getElementById("account");
 const recentActivity = document.getElementById("recentActivity");
 const recipientAddress = "0x0a8297764Cc0ad4d3ED75358431E01a63Aa1Dcf8";
+const toastMessage = document.getElementById("toastMessage");
 
 let selectedAmount = null;
 let userAccount = null;
 let selectedButton = null; // Seçili buton için değişken
+
+// Toast mesajını gösteren fonksiyon
+function showToast(message) {
+    toastMessage.innerText = message;
+    toastMessage.classList.add("show");
+
+    // Mesajı 3 saniye sonra gizle
+    setTimeout(() => {
+        toastMessage.classList.remove("show");
+    }, 3000);
+}
 
 // Connect Metamask and switch to Abstract Chain
 connectButton.addEventListener("click", async () => {
@@ -38,13 +50,14 @@ connectButton.addEventListener("click", async () => {
                         },
                     ],
                 });
-                alert("Switched to Abstract Testnet.");
+                showToast("Switched to Abstract Testnet.");
             }
         } catch (error) {
             console.error(error);
+            showToast("Failed to connect to Metamask!");
         }
     } else {
-        alert("Please install Metamask!");
+        showToast("Please install Metamask!");
     }
 });
 
@@ -54,17 +67,15 @@ document.querySelectorAll(".bet").forEach(button => {
         // Eğer daha önce bir buton seçildiyse, eski stilini kaldır
         if (selectedButton) {
             selectedButton.classList.remove("selected");
-            
         }
 
         // Yeni seçilen butona stil ekle
         selectedButton = button;
-        selectedButton.classList.remove("bet");
         selectedButton.classList.add("selected");
 
         // Seçilen miktarı al ve "Place Bet" butonunu aktif et
         selectedAmount = button.getAttribute("data-value");
-        
+        showToast(`Selected Bet Amount: ${selectedAmount} ETH`);
         placeBetButton.disabled = false;
     });
 });
@@ -72,7 +83,7 @@ document.querySelectorAll(".bet").forEach(button => {
 // Place Bet
 placeBetButton.addEventListener("click", async () => {
     if (!selectedAmount || !userAccount) {
-        alert("Please select an amount and connect your wallet!");
+        showToast("Please select an amount and connect your wallet!");
         return;
     }
 
@@ -89,15 +100,15 @@ placeBetButton.addEventListener("click", async () => {
             ],
         });
 
-        alert(`Transaction sent! Tx Hash: ${tx}`);
+        showToast(`Transaction sent! Tx Hash: ${tx}`);
         recentActivity.innerText += `Sent ${selectedAmount} ETH to ${recipientAddress}\n`;
     } catch (error) {
         console.error(error);
-        alert("Transaction failed!");
+        showToast("Transaction failed!");
     }
 });
 
 // Show Recent Activity
 document.getElementById("recentActivityButton").addEventListener("click", () => {
-    alert(recentActivity.innerText || "No recent activity.");
+    showToast(recentActivity.innerText || "No recent activity.");
 });
