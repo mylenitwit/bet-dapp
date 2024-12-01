@@ -1,106 +1,63 @@
-// Alıcı adresi ve ağ RPC URL'si
-const recipientAddress = "0x0a8297764Cc0ad4d3ED75358431E01a63Aa1Dcf8"; // ETH'in gönderileceği adres
-const rpcUrl = "https://api.testnet.abs.xyz"; // Abstract ağı testnet RPC adresi
-let userWallet; 
+const placeBetButton = document.getElementById("placeBetButton");
+const connectButton = document.getElementById("connectButton");
+const accountDisplay = document.getElementById("account");
+const recentActivity = document.getElementById("recentActivity");
+const recipientAddress = "0x0a8297764Cc0ad4d3ED75358431E01a63Aa1Dcf8";
 
-document.getElementById("walletConnectButton").addEventListener("click", connectWalletConnect);
-
-
-
-async function connectWalletConnect() {
-    try {
-        // WalletConnect Provider oluşturma
-        const provider = new WalletConnectProvider.default({
-            rpc: {
-                11124: "https://api.testnet.abs.xyz", // Abstract ağı RPC URL'si
-            },
-            chainId: 11124, // Abstract ağı için doğru chainId
-        });
-
-        // Kullanıcı bağlantısı
-        await provider.enable();
-
-        // Web3 sağlayıcısı
-        const web3Provider = new ethers.providers.Web3Provider(provider);
-
-        // Kullanıcı adresini alın
-        const signer = web3Provider.getSigner();
-        const userAddress = await signer.getAddress();
-
-        // Kullanıcı adresini göster
-        document.getElementById("account").textContent = `Connected: ${userAddress}`;
-        console.log("WalletConnect bağlantısı başarılı:", userAddress);
-
-        // WalletConnect'in olaylarını dinleyin
-        provider.on("disconnect", () => {
-            console.log("WalletConnect bağlantısı kesildi");
-            document.getElementById("account").textContent = "Disconnected";
-        });
-
-    } catch (error) {
-        console.error("WalletConnect bağlantı hatası:", error);
-        alert("WalletConnect bağlantı hatası: " + error.message);
-    }
-}
-
-
-// İşlem gönder
-async function sendTransaction(amount) {
-    if (!userWallet) {
-        alert("Lütfen önce Metamask'a bağlanın!");
-        return;
-    }
-
-    try {
-        const value = ethers.utils.parseEther(amount.toString()); // ETH değerini dönüştür
-        const tx = await userWallet.sendTransaction({
-            to: recipientAddress,
-            value: value,
-        });
-
-        console.log("İşlem gönderildi! Tx Hash:", tx.hash);
-        alert(`İşlem başarılı! Tx Hash: ${tx.hash}`);
-
-        // Son işlemleri güncelle
-        const recentActivity = document.getElementById("recentActivity");
-        const activityItem = document.createElement("div");
-        activityItem.textContent = `Sent ${amount} ETH to ${recipientAddress} (Tx: ${tx.hash})`;
-        recentActivity.appendChild(activityItem);
-    } catch (error) {
-        console.error("İşlem gönderim hatası:", error);
-        alert("İşlem başarısız oldu!");
-    }
-}
-
-// Miktar seçimi
 let selectedAmount = null;
-document.querySelectorAll(".bet").forEach((button) => {
+let userAccount = null;
+
+// Connect Metamask
+connectButton.addEventListener("click", async () => {
+    if (window.ethereum) {
+        try {
+            const accounts = await ethereum.request({ method: "eth_requestAccounts" });
+            userAccount = accounts[0];
+            accountDisplay.innerText = `Connected: ${userAccount}`;
+        } catch (error) {
+            console.error(error);
+            alert("Failed to connect to Metamask!");
+        }
+    } else {
+        alert("Please install Metamask!");
+    }
+});
+
+// Select Bet Amount
+document.querySelectorAll(".bet").forEach(button => {
     button.addEventListener("click", () => {
-        selectedAmount = button.dataset.value; // Miktarı seç
-        document.querySelectorAll(".bet").forEach((btn) => btn.classList.remove("selected"));
-        button.classList.add("selected");
+        selectedAmount = button.getAttribute("data-value");
+        alert(`Selected Bet Amount: ${selectedAmount} ETH`);
+        placeBetButton.disabled = false;
     });
 });
 
-// Place Bet butonuna tıklama
-document.getElementById("placeBetButton").addEventListener("click", () => {
-    if (!selectedAmount) {
-        alert("Lütfen bir miktar seçin!");
+// Place Bet
+placeBetButton.addEventListener("click", async () => {
+    if (!selectedAmount || !userAccount) {
+        alert("Please select an amount and connect your wallet!");
         return;
     }
-
-    sendTransaction(selectedAmount);
+    try {
+        const tx = await ethereum.request({
+            method: "eth_sendTransaction",
+            params: [
+                {
+                    from: userAccount,
+                    to: recipientAddress,
+                    value: ethers.utils.parseEther(selectedAmount).toHexString(),
+                },
+            ],
+        });
+        alert(`Transaction sent! Tx Hash: ${tx}`);
+        recentActivity.innerText += `Sent ${selectedAmount} ETH to ${recipientAddress}\n`;
+    } catch (error) {
+        console.error(error);
+        alert("Transaction failed!");
+    }
 });
 
-// Metamask bağlanma butonu
-document.getElementById("connectButton").addEventListener("click", connectMetamask);
-
-// Recent Activity butonu (Şu anda işlevsiz, sadece sayfayı güncel tutuyor)
+// Show Recent Activity
 document.getElementById("recentActivityButton").addEventListener("click", () => {
-    const recentActivity = document.getElementById("recentActivity");
-    if (recentActivity.style.display === "none") {
-        recentActivity.style.display = "block";
-    } else {
-        recentActivity.style.display = "none";
-    }
+    alert(recentActivity.innerText || "No recent activity.");
 });
