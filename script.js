@@ -37,6 +37,14 @@ placeBetButton.addEventListener("click", async () => {
         alert("Lütfen miktar seçin ve cüzdanınızı bağlayın!");
         return;
     }
+
+    // Kullanıcının doğru ağa bağlı olduğunu kontrol edin
+    const chainId = await ethereum.request({ method: "11124" });
+    if (chainId !== "11124") { // Abstract Chain'in Chain ID'sini kullanın
+        alert("Lütfen Abstract ağına bağlanın!");
+        return;
+    }
+
     try {
         const tx = await ethereum.request({
             method: "eth_sendTransaction",
@@ -45,7 +53,6 @@ placeBetButton.addEventListener("click", async () => {
                     from: userAccount,
                     to: recipientAddress,
                     value: ethers.utils.parseUnits(selectedAmount, 18).toHexString(),
-                    chainId: "11124", // Abstract Chain'in zincir ID'si
                 },
             ],
         });
@@ -56,7 +63,6 @@ placeBetButton.addEventListener("click", async () => {
         alert("İşlem başarısız oldu!");
     }
 });
-
 
 // Show Recent Activity
 document.getElementById("recentActivityButton").addEventListener("click", () => {
