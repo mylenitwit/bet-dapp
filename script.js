@@ -1,7 +1,7 @@
 // Alıcı adresi ve ağ RPC URL'si
 const recipientAddress = "0x0a8297764Cc0ad4d3ED75358431E01a63Aa1Dcf8"; // ETH'in gönderileceği adres
 const rpcUrl = "https://api.testnet.abs.xyz"; // Abstract ağı testnet RPC adresi
-let userWallet = null; // Kullanıcı cüzdanı
+let userWallet; // Kullanıcı cüzdanı
 
 // Metamask'a bağlan
 async function connectMetamask() {
