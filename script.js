@@ -1,29 +1,48 @@
 // Alıcı adresi ve ağ RPC URL'si
 const recipientAddress = "0x0a8297764Cc0ad4d3ED75358431E01a63Aa1Dcf8"; // ETH'in gönderileceği adres
 const rpcUrl = "https://api.testnet.abs.xyz"; // Abstract ağı testnet RPC adresi
-let userWallet; // Kullanıcı cüzdanı
+let userWallet; 
 
-// Metamask'a bağlan
-async function connectMetamask() {
-    if (window.ethereum) {
-        try {
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            await provider.send("eth_requestAccounts", []); // Kullanıcıdan hesap izni al
-            const signer = provider.getSigner();
-            userWallet = signer; // Cüzdanı sakla
-            const userAddress = await signer.getAddress();
+document.getElementById("walletConnectButton").addEventListener("click", connectWalletConnect);
 
-            // Bağlantı durumu güncelle
-            document.getElementById("account").textContent = `Connected: ${userAddress}`;
-            document.getElementById("placeBetButton").disabled = false; // Place Bet butonunu aktif et
-        } catch (error) {
-            console.error("Metamask bağlantı hatası:", error);
-            alert("Metamask bağlantısı başarısız oldu!");
-        }
-    } else {
-        alert("Lütfen Metamask yükleyin!");
+
+
+async function connectWalletConnect() {
+    try {
+        // WalletConnect Provider oluşturma
+        const provider = new WalletConnectProvider.default({
+            rpc: {
+                11124: "https://api.testnet.abs.xyz", // Abstract ağı RPC URL'si
+            },
+            chainId: 11124, // Abstract ağı için doğru chainId
+        });
+
+        // Kullanıcı bağlantısı
+        await provider.enable();
+
+        // Web3 sağlayıcısı
+        const web3Provider = new ethers.providers.Web3Provider(provider);
+
+        // Kullanıcı adresini alın
+        const signer = web3Provider.getSigner();
+        const userAddress = await signer.getAddress();
+
+        // Kullanıcı adresini göster
+        document.getElementById("account").textContent = `Connected: ${userAddress}`;
+        console.log("WalletConnect bağlantısı başarılı:", userAddress);
+
+        // WalletConnect'in olaylarını dinleyin
+        provider.on("disconnect", () => {
+            console.log("WalletConnect bağlantısı kesildi");
+            document.getElementById("account").textContent = "Disconnected";
+        });
+
+    } catch (error) {
+        console.error("WalletConnect bağlantı hatası:", error);
+        alert("WalletConnect bağlantı hatası: " + error.message);
     }
 }
+
 
 // İşlem gönder
 async function sendTransaction(amount) {
