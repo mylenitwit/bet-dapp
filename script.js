@@ -1,3 +1,7 @@
+const placeBetButton = document.getElementById("placeBetButton");
+const connectButton = document.getElementById("connectButton");
+const accountDisplay = document.getElementById("account");
+const recentActivity = document.getElementById("recentActivity");
 import { Provider, Wallet } from "zksync-ethers";
 import { ethers } from "ethers";
 
