@@ -42,7 +42,6 @@ connectButton.addEventListener("click", async () => {
             }
         } catch (error) {
             console.error(error);
-            alert("Failed to connect to Metamask!");
         }
     } else {
         alert("Please install Metamask!");
@@ -53,7 +52,6 @@ connectButton.addEventListener("click", async () => {
 document.querySelectorAll(".bet").forEach(button => {
     button.addEventListener("click", () => {
         selectedAmount = button.getAttribute("data-value");
-        alert(`Selected Bet Amount: ${selectedAmount} ETH`);
         placeBetButton.disabled = false;
     });
 });
