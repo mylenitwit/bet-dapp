@@ -32,28 +32,41 @@ document.querySelectorAll(".bet").forEach(button => {
     });
 });
 
-// Place Bet
 placeBetButton.addEventListener("click", async () => {
-    if (!selectedAmount || !userAccount) {
-        alert("Please select an amount and connect your wallet!");
-        return;
-    }
     try {
+        // UI Güncelleniyor
+        placeBetButton.disabled = true;
+        placeBetButton.innerText = "Processing...";
+
+        // Ağ bağlantısı ve işlem
+        const chainId = await ethereum.request({ method: "eth_chainId" });
+        if (chainId !== "0xABCD") {
+            alert("Lütfen Abstract ağına bağlanın!");
+            return;
+        }
+
         const tx = await ethereum.request({
             method: "eth_sendTransaction",
             params: [
                 {
                     from: userAccount,
                     to: recipientAddress,
-                    value: ethers.utils.parseEther(selectedAmount).toHexString(),
+                    value: ethers.utils.parseUnits(selectedAmount, 18).toHexString(),
                 },
             ],
         });
-        alert(`Transaction sent! Tx Hash: ${tx}`);
-        recentActivity.innerText += `Sent ${selectedAmount} ETH to ${recipientAddress}\n`;
+
+        // Başarılı işlem sonrası
+        alert(`İşlem gönderildi! Tx Hash: ${tx}`);
+        recentActivity.innerText += `Sent ${selectedAmount} ABT to ${recipientAddress}\n`;
+
     } catch (error) {
         console.error(error);
-        alert("Transaction failed!");
+        alert("İşlem başarısız oldu!");
+    } finally {
+        // UI Güncellemeleri Geri Alınıyor
+        placeBetButton.disabled = false;
+        placeBetButton.innerText = "Place Bet";
     }
 });
 
